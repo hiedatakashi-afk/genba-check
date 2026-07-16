@@ -37,34 +37,34 @@ button{border:0;border-radius:11px;padding:12px 10px;font-weight:700;font-size:1
 #reportView{min-height:100vh;background:#fff}
 .toolbar{position:sticky;top:0;z-index:30;background:var(--navy);padding:10px;display:flex;gap:8px}
 .page{max-width:210mm;margin:auto;background:#fff;padding:9mm}
-.rhead{border-bottom:2px solid #111;padding-bottom:5px;margin-bottom:6px}
+.rhead{border-bottom:3px solid var(--red);padding-bottom:5px;margin-bottom:6px}
 .rlogotop{text-align:center;margin-bottom:6px}
 .rlogotop img{max-width:70mm;max-height:22mm;object-fit:contain}
 .textlogo small{display:block;font-size:7pt}.textlogo strong{font-size:20pt}
 .rtitle{text-align:center;font-size:17pt;font-weight:800;writing-mode:horizontal-tb}
 .rcompany{text-align:center;font-size:8pt;margin-bottom:3px}
-.project{margin:5px 0;padding:6px 8px;border:1.5px solid #111;text-align:center;font-size:13pt;font-weight:800;writing-mode:horizontal-tb;word-break:break-word}
+.project{margin:5px 0;padding:6px 8px;border:1.5px solid var(--red);background:#fdf1f0;text-align:center;font-size:13pt;font-weight:800;writing-mode:horizontal-tb;word-break:break-word;color:#111}
 .meta{display:grid;grid-template-columns:1fr 1fr;gap:3px 12px;font-size:9pt}
 .columns{column-count:2;column-gap:6mm}
 .rsec{break-inside:avoid;border:1px solid #999;margin-bottom:4px;font-size:8.8pt}
-.rsec h3,.rphotos h3{margin:0;padding:3px 5px;background:#e5e7eb;border-bottom:1px solid #999;font-size:9.5pt}
+.rsec h3,.rphotos h3{margin:0;padding:3px 8px;background:#fdf1f0;border-left:3px solid var(--red);border-bottom:1px solid #999;font-size:9.5pt;font-weight:700}
 .rrow{display:grid;grid-template-columns:43% 57%;border-bottom:1px solid #ddd;min-height:19px}.rrow:last-child{border-bottom:0}
 .rl{font-weight:700;background:#fafafa;border-right:1px solid #ddd;padding:2px 4px}.rv{padding:2px 4px;overflow-wrap:anywhere}
-.rphotos{border:1px solid #999;margin-top:5px;break-inside:avoid;page-break-inside:avoid}.rpgrid{display:flex;flex-wrap:wrap;gap:2.5mm;padding:2.5mm}
-.rpgrid figure{margin:0;flex:0 0 calc(33.333% - 1.7mm);break-inside:avoid;page-break-inside:avoid}.rpgrid img{width:100%;height:40mm;object-fit:cover;border:1px solid #aaa;display:block}.rpgrid figcaption{text-align:center;font-size:7.5pt}
+.rphotos{border:1px solid #999;margin-top:5px}.rpgrid{padding:2.5mm}
+.rprow{display:flex;gap:2.5mm;margin-bottom:2.5mm;break-inside:avoid;page-break-inside:avoid}.rprow:last-child{margin-bottom:0}
+.rprow figure{flex:1;margin:0}.rprow img{width:100%;height:40mm;object-fit:cover;border:1px solid #ccc;border-radius:3px;display:block}.rprow figcaption{text-align:center;font-size:7.5pt;font-weight:700;margin-top:2px}
 .note{font-size:7pt;color:#555;margin-top:4px}
 @page{size:A4 portrait;margin:8mm}
 @media(max-width:640px){
 .grid{grid-template-columns:1fr}.checkrow{grid-template-columns:24px 1fr}.checkrow select{grid-column:2}.actions{grid-template-columns:1fr}
 .page{width:100%;padding:12px}.rlogotop img{max-width:50mm}.meta{grid-template-columns:1fr}
-.columns{column-count:1}.rpgrid figure{flex-basis:100%}.rpgrid img{height:auto;max-height:280px}.rtitle{font-size:21px}.project{font-size:17px}.rsec{font-size:13px}
+.columns{column-count:1}.rprow img{height:auto;max-height:280px}.rtitle{font-size:21px}.project{font-size:17px}.rsec{font-size:13px}
 }
 @media print{#formView,.toolbar{display:none!important}#reportView{display:block!important}.page{padding:0;max-width:none}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .rphotos{break-before:page;page-break-before:always;border:0}
-.rpgrid{gap:5mm}
-.rpgrid figure{flex-basis:calc(50% - 2.5mm)!important}
-.rpgrid img{height:85mm!important}
-.rpgrid figure:nth-child(2n):not(:last-child){break-after:page;page-break-after:always}
+.rprow{gap:5mm;margin-bottom:5mm}
+.rprow img{height:85mm!important}
+.rprow:nth-child(2n):not(:last-child){break-after:page;page-break-after:always}
 }
 </style>
 </head>
@@ -187,9 +187,9 @@ function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
 async function showReport(){await saveAll();const sections=[];document.querySelectorAll('#surveyForm>.card').forEach(sec=>{const h=sec.querySelector('h2');if(!h||['会社ロゴ','写真'].includes(h.textContent.trim()))return;const rows=[],used=new Set;sec.querySelectorAll('input,select,textarea').forEach(e=>{if(!e.name||used.has(e.name)||e.type==='file')return;used.add(e.name);if(e.type==='checkbox'){if(e.checked)rows.push([labelOf(e),'該当・確認済'])}else if(meaningful(e.value))rows.push([labelOf(e),e.value])});if(rows.length)sections.push([h.textContent.trim(),rows])});
 let body='';sections.forEach(([t,rows])=>{body+=`<section class="rsec"><h3>${esc(t)}</h3>`;rows.forEach(([l,v])=>body+=`<div class="rrow"><div class="rl">${esc(l)}</div><div class="rv">${esc(v).replace(/\n/g,'<br>')}</div></div>`);body+='</section>'});
 const logo=await get('logo'),d=collect(),brand=logo?`<img src="${logo.dataUrl}">`:`<div class="textlogo"><small>株式会社</small><strong>ロジック</strong></div>`;
-let photos=[];for(const[id,title]of photoDefs){const list=await get('photo_'+id)||[];if(list.length&&photos.length<6)photos.push([title,list[0].dataUrl])}
-let ph='';if(photos.length){ph='<section class="rphotos"><h3>現場写真（代表写真）</h3><div class="rpgrid">';photos.forEach(([t,s])=>ph+=`<figure><img src="${s}"><figcaption>${esc(t)}</figcaption></figure>`);ph+='</div></section>'}
-document.getElementById('reportPage').innerHTML=`<header class="rhead"><div class="rlogotop">${brand}</div><div class="rtitle">現場調査報告書</div><div class="rcompany">株式会社ロジック</div><div class="project">${esc(d.siteName||'工事件名未入力')}</div><div class="meta"><div><b>現調日：</b>${esc(d.surveyDate||'')}</div><div><b>担当者：</b>${esc(d.staff||'')}</div><div><b>立会者：</b>${esc(d.client||'')}</div></div></header><div class="columns">${body}</div>${ph}<div class="note">未入力項目は省略しています。写真は代表写真を最大6枚表示します。</div>`;
+let photos=[];for(const[id,title]of photoDefs){const list=await get('photo_'+id)||[];if(list.length&&photos.length<8)photos.push([title,list[0].dataUrl])}
+let ph='';if(photos.length){ph='<section class="rphotos"><h3>現場写真（代表写真）</h3><div class="rpgrid">';for(let i=0;i<photos.length;i+=2){ph+='<div class="rprow">';for(let j=i;j<Math.min(i+2,photos.length);j++){const[t,s]=photos[j];ph+=`<figure><img src="${s}"><figcaption>${esc(t)}</figcaption></figure>`}ph+='</div>'}ph+='</div></section>'}
+document.getElementById('reportPage').innerHTML=`<header class="rhead"><div class="rlogotop">${brand}</div><div class="rtitle">現場調査報告書</div><div class="rcompany">株式会社ロジック</div><div class="project">${esc(d.siteName||'工事件名未入力')}</div><div class="meta"><div><b>現調日：</b>${esc(d.surveyDate||'')}</div><div><b>担当者：</b>${esc(d.staff||'')}</div><div><b>立会者：</b>${esc(d.client||'')}</div></div></header><div class="columns">${body}</div>${ph}<div class="note">未入力項目は省略しています。写真は代表写真を最大8枚表示します。</div>`;
 document.getElementById('formView').classList.add('hidden');document.getElementById('reportView').classList.remove('hidden');
 document.title=(d.siteName||'現場調査').replace(/[\\/:*?"<>|]/g,'_');
 scrollTo(0,0)}
