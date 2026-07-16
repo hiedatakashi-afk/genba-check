@@ -61,6 +61,13 @@ button{border:0;border-radius:11px;padding:12px 10px;font-weight:700;font-size:1
 .columns{column-count:1}.rprow img{height:auto;max-height:280px}.rtitle{font-size:21px}.project{font-size:17px}.rsec{font-size:13px}
 }
 @media print{#formView,.toolbar{display:none!important}#reportView{display:block!important}.page{padding:0;max-width:none}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.columns{column-count:3;column-gap:4mm}
+.rsec{font-size:7.8pt}
+.rrow{min-height:15px}
+.rl,.rv{padding:1px 3px}
+.rsec h3,.rphotos h3{padding:2px 6px;font-size:8.5pt}
+.meta{font-size:8pt}
+.project{padding:4px 6px;font-size:12pt;margin:3px 0}
 .rphotos{break-before:page;page-break-before:always;border:0}
 .rprow{gap:5mm;margin-bottom:5mm}
 .rprow img{height:85mm!important}
@@ -79,6 +86,7 @@ button{border:0;border-radius:11px;padding:12px 10px;font-weight:700;font-size:1
 <div><label for="staff">担当者</label><input id="staff" name="staff" type="text" value="中迫 一斗"></div>
 <div><label for="client">立会者</label><input id="client" name="client" type="text"></div>
 <div class="full"><label for="address">現場住所</label><input id="address" name="address" type="text"></div>
+<div class="full"><label for="workContent">施工内容</label><textarea id="workContent" name="workContent"></textarea></div>
 </div></section>
 
 <section class="card"><h2>会社ロゴ</h2><input id="logoFile" type="file" accept="image/png,image/jpeg,image/webp"><div id="logoPreview" class="logo"></div>
@@ -127,6 +135,7 @@ button{border:0;border-radius:11px;padding:12px 10px;font-weight:700;font-size:1
 <div><label for="floorArea">床面積（㎡）</label><input id="floorArea" name="floorArea" type="number" step="0.01"></div>
 <div><label for="wallArea">壁面積（㎡）</label><input id="wallArea" name="wallArea" type="number" step="0.01"></div>
 <div><label for="ceilingHeight">天井高さ（mm）</label><input id="ceilingHeight" name="ceilingHeight" type="number"></div>
+<div><label for="pocketDepth">ふところ（mm）</label><input id="pocketDepth" name="pocketDepth" type="number"></div>
 <div><label for="opening">主要開口寸法</label><input id="opening" name="opening" type="text"></div>
 <div class="full"><label for="buildingMemo">既存下地・損傷・納まり</label><textarea id="buildingMemo" name="buildingMemo"></textarea></div>
 </div></section>
@@ -184,7 +193,7 @@ async function deleteLogo(){await del('logo');document.getElementById('logoPrevi
 function meaningful(v){return v!==undefined&&v!==null&&!['','未確認'].includes(String(v).trim())}
 function labelOf(e){if(e.id){const l=document.querySelector(`label[for="${e.id}"]`);if(l)return l.textContent.trim()}const r=e.closest('.checkrow');if(r&&r.querySelector('span'))return r.querySelector('span').textContent.trim();return e.name}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
-async function showReport(){await saveAll();const sections=[];document.querySelectorAll('#surveyForm>.card').forEach(sec=>{const h=sec.querySelector('h2');if(!h||['会社ロゴ','写真'].includes(h.textContent.trim()))return;const rows=[],used=new Set;sec.querySelectorAll('input,select,textarea').forEach(e=>{if(!e.name||used.has(e.name)||e.type==='file')return;used.add(e.name);if(e.type==='checkbox'){if(e.checked)rows.push([labelOf(e),'該当・確認済'])}else if(meaningful(e.value))rows.push([labelOf(e),e.value])});if(rows.length)sections.push([h.textContent.trim(),rows])});
+async function showReport(){await saveAll();const sections=[];document.querySelectorAll('#surveyForm>.card').forEach(sec=>{const h=sec.querySelector('h2');if(!h||['会社ロゴ','写真'].includes(h.textContent.trim()))return;const rows=[],used=new Set;sec.querySelectorAll('input,select,textarea').forEach(e=>{if(!e.name||used.has(e.name)||e.type==='file'||e.type==='checkbox')return;used.add(e.name);if(meaningful(e.value))rows.push([labelOf(e),e.value])});if(rows.length)sections.push([h.textContent.trim(),rows])});
 let body='';sections.forEach(([t,rows])=>{body+=`<section class="rsec"><h3>${esc(t)}</h3>`;rows.forEach(([l,v])=>body+=`<div class="rrow"><div class="rl">${esc(l)}</div><div class="rv">${esc(v).replace(/\n/g,'<br>')}</div></div>`);body+='</section>'});
 const logo=await get('logo'),d=collect(),brand=logo?`<img src="${logo.dataUrl}">`:`<div class="textlogo"><small>株式会社</small><strong>ロジック</strong></div>`;
 let photos=[];for(const[id,title]of photoDefs){const list=await get('photo_'+id)||[];if(list.length&&photos.length<8)photos.push([title,list[0].dataUrl])}
