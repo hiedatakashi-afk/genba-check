@@ -59,7 +59,13 @@ button{border:0;border-radius:11px;padding:12px 10px;font-weight:700;font-size:1
 .page{width:100%;padding:12px}.rlogotop img{max-width:50mm}.meta{grid-template-columns:1fr}
 .columns{column-count:1}.rpgrid figure{flex-basis:100%}.rpgrid img{height:auto;max-height:280px}.rtitle{font-size:21px}.project{font-size:17px}.rsec{font-size:13px}
 }
-@media print{#formView,.toolbar{display:none!important}#reportView{display:block!important}.page{padding:0;max-width:none}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+@media print{#formView,.toolbar{display:none!important}#reportView{display:block!important}.page{padding:0;max-width:none}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.rphotos{break-before:page;page-break-before:always;border:0}
+.rpgrid{gap:5mm}
+.rpgrid figure{flex-basis:calc(50% - 2.5mm)!important}
+.rpgrid img{height:85mm!important}
+.rpgrid figure:nth-child(2n):not(:last-child){break-after:page;page-break-after:always}
+}
 </style>
 </head>
 <body>
